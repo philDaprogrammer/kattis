@@ -8,10 +8,10 @@ struct TestCase {
 }
 
 /**
- * implement 'TestCase' struct to print the list for the desired format
+ * implement 'TestCase' struct to print the list to the desired format
  */
 impl TestCase {
-   pub fn dump_list(&mut self)  {
+   pub fn dump_list(&mut self) {
        if self.list.is_empty() {
            println!("[]");
            return
@@ -97,16 +97,12 @@ fn solve(cases: Vec<TestCase>) {
             if inst == 'R' {
                 case.is_reversed = !case.is_reversed;
             } else if inst == 'D' {
-                let elem: Option<String>;
+                let elem: Option<String> =
+                    if case.is_reversed { case.list.pop_back() } else { case.list.pop_front() };
 
-                elem = if case.is_reversed { case.list.pop_back() } else { case.list.pop_front() };
-
-                match elem {
-                    Some(_s) => {}, // nothing to do here
-                    None     => {   // empty list, we have an error
-                        println!("error");
-                        continue 'outer;
-                    }
+                if elem == None {
+                   println!("error");
+                   continue 'outer;
                 }
             }
         }
