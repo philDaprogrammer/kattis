@@ -9,6 +9,6 @@ I have encountered problems that are 'easy' but are actually really
 well know problems that are hard. So the rating system is really not 
 great at encapsulating problem difficulty. 
 
-#Solutions:
+# Solutions:
   - Interger Lists:  https://open.kattis.com/problems/integerlists 
   - 10 kinds of people:  https://open.kattis.com/problems/10kindsofpeople
