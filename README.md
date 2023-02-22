@@ -12,3 +12,4 @@ great at encapsulating problem difficulty.
 # Solutions:
   - Interger Lists:  https://open.kattis.com/problems/integerlists 
   - 10 kinds of people:  https://open.kattis.com/problems/10kindsofpeople
+  - https://open.kattis.com/problems/sequences
