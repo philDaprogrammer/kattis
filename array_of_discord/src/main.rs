@@ -1,6 +1,5 @@
 use std::io::{self, Stdin, BufRead};
 
-
 fn parse() -> Vec<String> {
     let stdin: Stdin       = io::stdin();
     let lines: Vec<String> = stdin.lock()
@@ -10,7 +9,6 @@ fn parse() -> Vec<String> {
         .collect()
 }
 
-
 fn dump_list(nums: &Vec<String>) {
     for num in nums {
         print!("{} ", num);
@@ -19,6 +17,31 @@ fn dump_list(nums: &Vec<String>) {
     println!()
 }
 
+
+/* Solve in O(n) time
+ *
+ * Let a and b both be consecutive numbers
+ * in the sorted list.
+ *
+ * If len(a) != len(b) then it is impossible
+ * to invalidate the sorting as we cannot
+ * remove digits.
+ *
+ * Otherwise, we only need to compare the most
+ * significant digit of a and b. If we cannot
+ * invalidate the sorting by changing one of the
+ * most significant digits, then it is impossible
+ * to invalidate the sorting with that pair.
+ *
+ * It is only impossible to invalidate in two cases
+ * when the strings are of equal length. If len(a) and
+ * len(b) = 1, then we cannot invalidate when
+ * a[0] = 0, and b[0] = 9. If their lengths
+ * are greater than one, we cannot invalidate
+ * when a[0] = 1 and b[0] = 9. The logic is
+ * fairly straight forward for why this is true
+ *
+ **/
 fn solve(mut nums: Vec<String>) {
     let mut invalidated: bool = false;
 
@@ -67,6 +90,7 @@ fn solve(mut nums: Vec<String>) {
 }
 
 
-fn main() {
-    solve(parse())
+fn main() -> io::Result<()>{
+    solve(parse());
+    Ok(())
 }
