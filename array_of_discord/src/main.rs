@@ -18,7 +18,7 @@ fn dump_list(nums: &Vec<String>) {
 }
 
 
-/* Solve in O(n) time
+/** Solve in O(n) time
  *
  * Let a and b both be consecutive numbers
  * in the sorted list.
@@ -41,7 +41,7 @@ fn dump_list(nums: &Vec<String>) {
  * when a[0] = 1 and b[0] = 9. The logic is
  * fairly straight forward for why this is true
  *
- **/
+ */
 fn solve(mut nums: Vec<String>) {
     let mut invalidated: bool = false;
 
