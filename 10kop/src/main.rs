@@ -2,29 +2,23 @@ use std::io::{self, BufRead, Stdin};
 use std::collections::{VecDeque};
 
 #[derive(Clone)]
-struct Point {
-    r: i32,
-    c: i32
-}
-
-#[derive(Clone)]
 struct Pair {
-    p1: Point,
-    p2: Point
+    p1: (usize, usize),
+    p2: (usize, usize)
 }
 
 #[derive(Clone)]
 struct Input {
-    rows: usize,
+    rows:    usize,
     columns: usize,
-    graph: Vec<Vec<char>>,
+    graph:   Vec<Vec<char>>,
     queries: Vec<Pair>
 }
 
 #[derive(Clone)]
 struct Node {
-    kind: char,
-    component: i32
+    area_type: char,
+    group:    u32
 }
 
 /* adjacent cells to look at */
@@ -61,14 +55,15 @@ fn parse() -> Input {
     }
 
     let num_queries: usize = lines.pop_front().unwrap().parse().unwrap();
-    queries = vec![Pair {p1: Point{r: 0, c: 0}, p2: Point{r: 0, c: 0}};  num_queries];
+    queries = vec![Pair {p1: (0, 0), p2: (0, 0)};  num_queries];
 
     /* read in the number of queries */
     for i in 0..num_queries {
         nums = lines.pop_front().unwrap().split(" ")
             .map(| r| r.trim().parse().unwrap()).collect();
 
-        queries[i] = Pair{p1: Point {r: nums[0], c: nums[1]}, p2: Point {r: nums[2], c: nums[3]}};
+        queries[i] = Pair{p1:((nums[0]-1) as usize, (nums[1]-1) as usize),
+                          p2:((nums[2]-1) as usize, (nums[3]-1) as usize)};
     }
 
     Input{rows, columns, graph, queries}
@@ -77,8 +72,8 @@ fn parse() -> Input {
 /**
  * helper function to see if a nodes indices are within matrix bounds
  */
-fn inbounds(length: usize, width: usize, r: i32, c: i32) -> bool {
-    r >= 0 && (r as usize) < length && c >= 0 && (c as usize) < width
+fn inbounds(length: i32, width: i32, x: i32, y: i32) -> bool {
+    x >= 0 && x < length && y >= 0 && y < width
 }
 
 /**
@@ -126,52 +121,58 @@ fn inbounds(length: usize, width: usize, r: i32, c: i32) -> bool {
  * be right (yep, that's really it ...)
  */
 fn solve(input: Input) {
+    let length = input.graph.len() as i32;
+    let width  = input.graph[0].len() as i32;
+
     /* discovered and connected components matrix's */
     let mut discovered: Vec<Vec<i8>> = vec![vec![0; input.columns]; input.rows];
-    let mut cc: Vec<Vec<Node>>       = vec![vec![Node{kind: '\0', component: -1}; input.columns]; input.rows];
+    let mut cc: Vec<Vec<Node>>       = vec![vec![Node{area_type: '\0', group: 0}; input.columns]; input.rows];
 
     /* ID's for each groups connected components */
-    let mut cc_zero_id: i32 = 0;
-    let mut cc_one_id: i32  = 0;
+    let mut cc_zero_id: u32 = 1;
+    let mut cc_one_id: u32  = 1;
 
     for i in 0..input.rows {
         for j in 0..input.columns {
 
             /* not yet discovered, run bsf from this point */
             if discovered[i][j] == 0 {
-                let area_type: char  = input.graph[i][j];
-                let mut point: Point = Point{r: i as i32, c: j as i32};
+                let area_type: char = input.graph[i][j];
 
                 /* get the current connected component ID */
-                let group: i32 = if area_type == '0' { cc_zero_id } else { cc_one_id };
+                let group = if area_type == '0' { cc_zero_id } else { cc_one_id };
                 /* update component ID's */
                 if area_type == '0' { cc_zero_id += 1 } else { cc_one_id += 1 }
                 /* bsf queue */
-                let mut queue: VecDeque<Point> = VecDeque::new();
+                let mut queue: VecDeque<(usize, usize)> = VecDeque::new();
 
                 /* update the current node */
-                cc[i][j]          = Node{ kind: area_type, component: group };
+                cc[i][j]          = Node{area_type, group};
                 discovered[i][j]  = 1;
 
-                queue.push_back(point);
+                queue.push_back((i, j));
 
                 /* run bsf */
                 while !queue.is_empty() {
-                    point = queue.pop_front().unwrap();
+                    let point = queue.pop_front().unwrap();
 
                     for n in NEIGHBORS {
-                        let new_point    = Point{r: point.r + n.0, c: point.c + n.1};
-                        let new_r: usize = new_point.r as usize;
-                        let new_c: usize = new_point.c as usize;
+                        let new_x = point.0 as i32 + n.0;
+                        let new_y = point.1 as i32 + n.1;
+
+                        /* not a valid node to check */
+                        if !inbounds(length, width, new_x, new_y) {
+                            continue;
+                        }
+
+                        let new= (new_x as usize, new_y as usize);
 
                         /* new node to add */
-                        if inbounds(input.graph.len(), input.graph[0].len(), new_point.r, new_point.c)
-                            && discovered[new_r][new_c]  == 0
-                            && input.graph[new_r][new_c] == area_type {
+                        if discovered[new.0][new.1] == 0 && input.graph[new.0][new.1] == area_type {
 
-                            discovered[new_r][new_c] = 1;
-                            cc[new_r][new_c] = Node{kind: area_type, component: group};
-                            queue.push_back(new_point)
+                            discovered[new.0][new.1] = 1;
+                            cc[new.0][new.1] = Node{area_type, group};
+                            queue.push_back(new)
                         }
                     }
                 }
@@ -179,20 +180,19 @@ fn solve(input: Input) {
         }
     }
 
-    /* answer each query in constant time. theta(q) overall */
+    /* answer each query in constant time, theta(q) overall */
     for query in input.queries {
-        let start: Node = cc[(query.p1.r - 1) as usize][(query.p1.c - 1) as usize].clone();
-        let end: Node   = cc[(query.p2.r - 1) as usize][(query.p2.c - 1) as usize].clone();
+        let start= &cc[query.p1.0][query.p1.1];
+        let end  = &cc[query.p2.0][query.p2.1];
 
-        /* we are in the same component */
-        if start.component == end.component && start.kind == end.kind {
-            println!("{}", if start.kind == '0' { "binary" } else { "decimal" } )
+        /* we are in the same connected component */
+        if start.area_type == end.area_type && start.group == end.group {
+            println!("{}", if start.area_type == '0' { "binary" } else { "decimal" } )
         } else {
             println!("neither")
         }
     }
 }
-
 
 pub fn main() -> io::Result<()> {
     solve(parse());
