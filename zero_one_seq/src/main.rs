@@ -40,6 +40,7 @@ fn solve(bits: Vec<char>) {
     println!("{}", inv);
 }
 
-fn main() {
+fn main() -> io::Result<()> {
     solve(parse());
+    Ok(())
 }
