@@ -1,6 +1,6 @@
 use std::io::{self, BufRead, Stdin};
 
-const REM: u128 = 1000000007;
+const REM: u32 = 1000000007;
 
 fn parse() -> Vec<char> {
     let stdin: Stdin = io::stdin();
@@ -12,13 +12,12 @@ fn parse() -> Vec<char> {
 /**
  * Solution for 0-1 sequences on kattis.
  * Please see the brief paper explaining
- * the solution, as it is not very straight
- * forward.
+ * the solution
  */
 fn solve(bits: Vec<char>) {
-    let mut k:    u128  = 1; // number of possible outcomes at iteration i
-    let mut inv:  u128  = 0; // number of inversions at iteration i
-    let mut ones: u128  = 0; // number of total ones at iteration i
+    let mut k:    u32 = 1; // number of possible outcomes at iteration i
+    let mut inv:  u32 = 0; // number of inversions at iteration i
+    let mut ones: u32 = 0; // number of total ones at iteration i
 
     for b in bits {
         match  b {
