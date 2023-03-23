@@ -111,6 +111,7 @@ fn solve(cases: Vec<TestCase>) {
     }
 }
 
-fn main() {
-    solve(parse())
+fn main() -> io::Result<()>{
+    solve(parse());
+    Ok(())
 }
