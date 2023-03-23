@@ -7,8 +7,10 @@ so we did this one in python
 
 The solution is a direct application of the floyd-warshall 
 algorithm. Here is a wikipedia article that does a fairly 
-good job of explaining the algorithm: . The reason it is so
-efficient for this problem is that algorithm runs in theta(n ^ 3) 
+good job of explaining the algorithm: 
+https://en.wikipedia.org/wiki/Floyd%E2%80%93Warshall_algorithm. 
+
+The reason it is so efficient for this problem is that algorithm runs in theta(n ^ 3) 
 time and the problem guarantees that n <= 100. We can then answer 
 all queries in constant time by performing table lookups. 
 
@@ -63,7 +65,7 @@ def solve():
             else:
                 print(opts[src][dest])
 
-                
+
 def main():
     solve()
     return
