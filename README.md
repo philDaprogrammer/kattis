@@ -15,3 +15,4 @@ with an easier difficulty if their solutions are well known.
   - 0 - 1 sequence:           https://open.kattis.com/problems/sequences
   - Array of discord:         https://open.kattis.com/problems/arrayofdiscord
   - all pairs shortest path:  https://open.kattis.com/problems/allpairspath
+  - 1s for all:               https://open.kattis.com/problems/1sforall
